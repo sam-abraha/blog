@@ -1,15 +1,21 @@
 
 import './App.css'
-import Header from './components/Header.jsx'
-import Post from './components/Post.jsx'
+import { Route, Routes } from 'react-router-dom'
+import SigninPage from './pages/SigninPage.jsx'
+import SignupPage from './pages/SignupPage.jsx'
+import Layout from './components/Layout.jsx'
+import IndexPage from './pages/IndexPage.jsx'
 
 function App() {
 
   return (
-    <main className='p-10 max-w-screen-md ml-auto mr-auto'>
-      <Header/>
-      <Post/>
-    </main>
+    <Routes>
+    <Route path="/" element={<Layout />}>
+      <Route index element={<IndexPage />} />
+      <Route path="/signin" element={<SigninPage />} />
+      <Route path="/signup" element={<SignupPage />} />
+    </Route>
+    </Routes>
   )
 }
 

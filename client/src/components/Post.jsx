@@ -1,6 +1,6 @@
 export default function Post() {
     return (
-        <div className="mt-12 grid grid-cols-2 gap-5 text-left ">
+        <div className="mt-2 grid grid-cols-2 gap-5 text-left p-10 max-w-screen-md ml-auto mr-auto ">
         <div className="col-span-1">
           <img src="https://techcrunch.com/wp-content/uploads/2024/02/IMG_0247.jpeg?resize=1536,1152"
           className="w-full max-h-full"></img>
