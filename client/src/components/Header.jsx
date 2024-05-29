@@ -1,6 +1,27 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Header() {
+
+  const [username, setUsername] = useState(null)
+
+  useEffect(() => {
+    fetch('http://localhost:3000/profile',{
+      credentials : 'include'
+    }).then(response => {
+      response.json().then(userInfo => {
+        setUsername(userInfo.name)
+      })
+    })
+  }, [])
+
+  function signout() {
+    fetch('http://localhost:3000/signout',{
+      credentials: 'include',
+      method: 'POST',
+    })
+    setUsername(null)
+  }
     return (
     <header className='flex justify-between mt-4'>
         <Link to={'/'} className="">
@@ -10,8 +31,18 @@ export default function Header() {
         </Link>
         <Link to={'/'} className='font-bold'>TechBlog</Link>
         <nav className="flex font-bold gap-10">
-          <Link to={'/signin'} className='text-lime-600'>Signin</Link>
-          <Link to={'/signup'} className='text-lime-600'>Signup</Link>
+          {username && (
+            <>
+            <Link to={'/create'}  className='text-lime-600'>Create Post</Link>
+            <Link to={'/'} onClick={signout}>Signout</Link>
+            </>
+          )}
+          {!username && (
+            <>
+            <Link to={'/signin'} className='text-lime-600'>Signin</Link>
+            <Link to={'/signup'} className='text-lime-600'>Signup</Link>
+            </>
+          )}
         </nav>
     </header>
     )
