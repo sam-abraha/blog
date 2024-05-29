@@ -1,16 +1,20 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 
 export default function Header() {
 
-  const [username, setUsername] = useState(null)
+  //const [username, setUsername] = useState(null)
+  const {userInfo, setUserInfo} = useContext(UserContext)
+  const username = userInfo?.name;
 
   useEffect(() => {
     fetch('http://localhost:3000/profile',{
       credentials : 'include'
     }).then(response => {
       response.json().then(userInfo => {
-        setUsername(userInfo.name)
+        //setUsername(userInfo.name)
+        setUserInfo(userInfo)
       })
     })
   }, [])
@@ -20,7 +24,7 @@ export default function Header() {
       credentials: 'include',
       method: 'POST',
     })
-    setUsername(null)
+    setUserInfo(null)
   }
     return (
     <header className='flex justify-between mt-4'>
@@ -34,7 +38,7 @@ export default function Header() {
           {username && (
             <>
             <Link to={'/create'}  className='text-lime-600'>Create Post</Link>
-            <Link to={'/'} onClick={signout}>Signout</Link>
+            <Link to={'/'}        onClick={signout}>Signout</Link>
             </>
           )}
           {!username && (

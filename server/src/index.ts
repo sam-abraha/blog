@@ -86,7 +86,7 @@ app.post('/signin', async (req: Request, res: Response) => {
           throw error;
         }
         // Store signed JWT token inside HTTP cookie
-        res.cookie('token', token).json({'Sucess' : ' Access granted and cookie created'});
+        res.cookie('token', token).json({name :username , id : userDoc.id});
     })
 
     }else if(!passwordMatch) {

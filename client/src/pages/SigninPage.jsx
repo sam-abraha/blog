@@ -1,12 +1,13 @@
-import { useState } from "react"
-import axios from "axios"
+import { useContext, useState } from "react"
 import { Navigate } from "react-router-dom"
+import { UserContext } from "../context/UserContext"
 
 export default function SigninPage() {
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [redirect, setRedirect] = useState(false)
+    const {setUserInfo} = useContext(UserContext)
 
     async function signin(e) {
         e.preventDefault()
@@ -17,7 +18,10 @@ export default function SigninPage() {
             credentials: 'include',
           });
         if(response.ok) {
-            setRedirect(true)
+            response.json().then(userInfo => {
+                setUserInfo(userInfo)
+                setRedirect(true)
+            })
         }else {
             alert("Registration failed")
         }
