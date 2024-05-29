@@ -13,7 +13,7 @@ export default function SigninPage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
           });
-        if(response.ok===200) {
+        if(response.ok) {
             alert("Registration successful")
         }else {
             alert("Registration failed")

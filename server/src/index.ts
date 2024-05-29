@@ -2,7 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, User } from '@prisma/client';
+
 
 const prisma = new PrismaClient();
 const app = express();
@@ -10,6 +11,15 @@ app.use(cors());
 app.use(express.json());
 dotenv.config();
 const PORT = process.env.PORT;
+const SALT = bcrypt.genSaltSync(10)
+
+type UserWithPassword = {
+  id: number;
+  name: string;
+  password: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Test');
@@ -29,10 +39,11 @@ async function deleteAllUsers() {
 
 async function createUser(username: string, password: string) {
   try {
+    const hashedPassword = await bcrypt.hash(password, SALT)
     const user = await prisma.user.create({
       data: {
         name: username,
-        password: password,
+        password: hashedPassword,
       },
     });
     console.log('User created:', user);
@@ -42,12 +53,45 @@ async function createUser(username: string, password: string) {
   }
 }
 
-
 app.post('/signin', async (req: Request, res: Response) => {
+  const { username, password } = req.body;
+
+  try {
+    // Benutzer anhand des Benutzernamens finden
+    const userDoc = await prisma.user.findUnique({
+      where: {
+        name: username,
+      },
+    });
+
+    if (!userDoc) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (!userDoc.password) {
+      return res.status(500).json({ error: 'Password not available' });
+    }
+
+    // Check passwords
+    const passwordMatch = bcrypt.compareSync(password,userDoc.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Password invalid' });
+    }else if(passwordMatch) {
+      res.json({Message : "Success"});
+    }
+  } catch (error) {
+    console.error('Fehler beim Anmelden:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+
+app.post('/signup', async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
     const user = await createUser(username, password);
-    res.json(user);
+    res.status(200).json(user)
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });
