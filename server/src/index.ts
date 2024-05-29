@@ -7,19 +7,17 @@ import { PrismaClient, User } from '@prisma/client';
 
 const prisma = new PrismaClient();
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Allow this origin
+  credentials: true, // Allow credentials
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed methods
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+}));
 app.use(express.json());
 dotenv.config();
 const PORT = process.env.PORT;
 const SALT = bcrypt.genSaltSync(10)
 
-type UserWithPassword = {
-  id: number;
-  name: string;
-  password: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Test');
@@ -74,13 +72,13 @@ app.post('/signin', async (req: Request, res: Response) => {
 
     // Check passwords
     const passwordMatch = bcrypt.compareSync(password,userDoc.password);
-    if (!passwordMatch) {
-      return res.status(401).json({ error: 'Password invalid' });
-    }else if(passwordMatch) {
+    if (passwordMatch) {
       res.json({Message : "Success"});
+    }else if(!passwordMatch) {
+      return res.status(401).json({ error: 'Password invalid' });
     }
   } catch (error) {
-    console.error('Fehler beim Anmelden:', error);
+    console.error('Failed to signin:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
