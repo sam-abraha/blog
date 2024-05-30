@@ -37,7 +37,7 @@ export default function Header() {
         <nav className="flex font-bold gap-10">
           {username && (
             <>
-            <Link to={'/create'}  className='text-lime-600'>Create Post</Link>
+            <Link to={'/create-post'}  className='text-lime-600'>Create Post</Link>
             <Link to={'/'}        onClick={signout}>Signout</Link>
             </>
           )}

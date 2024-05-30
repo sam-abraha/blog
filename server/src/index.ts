@@ -5,6 +5,8 @@ import bcrypt from 'bcryptjs';
 import { PrismaClient, User } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
+import multer from 'multer'
+import fs from 'fs'
 
 
 const prisma = new PrismaClient();
@@ -22,6 +24,7 @@ dotenv.config();
 const PORT = process.env.PORT;
 const SECRET_KEY: string = process.env.SECRET_KEY as string; 
 const SALT = bcrypt.genSaltSync(10)
+const uploadMiddleware = multer({ dest: 'uploads/' });
 
 
 app.get('/', (req: Request, res: Response) => {
@@ -130,6 +133,51 @@ app.get('/profile',(req: Request, res: Response) => {
 app.post('/signout', (req: Request, res : Response) => {
   // Invalidate token
   res.cookie('token', '').json('Success : User signed out')
+
+})
+
+app.post('/posts', uploadMiddleware.single('file'), async (req: Request, res: Response) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  const { originalname } = req.file as Express.Multer.File; // Type assertion req.file should be treated as type Express.Multer.File
+  if (!originalname) {
+    return res.status(400).json({ error: 'No original file name found' });
+  }
+
+  // Retrieve extension name of the file
+  const parts = originalname.split('.');
+  const ext = parts[parts.length - 1];
+
+  if (!req.file.path) {
+    return res.status(400).json({ error: 'No file path found' });
+  }
+
+  // Rename file with extension
+  const newPath = `${req.file.path}.${ext}`;
+  fs.renameSync(req.file.path, newPath);
+
+  //res.json({ File : req.file });
+
+  // Create a post entry inside Postgres DB
+  const {title, summary, content, authorId } = req.body;
+
+  try {
+    const postDoc = await prisma.post.create({
+      data : {
+        title,
+        summary,
+        content,
+        cover : newPath,
+        published : true,
+        authorId : parseInt(authorId,10),
+      }
+    })
+    res.status(201).json(postDoc);
+  }catch(error) {
+    res.status(500).json('Error creating post')
+  }
 
 })
 
