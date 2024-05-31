@@ -33,7 +33,6 @@ export default function CreatePostPage() {
     const [content, setContent] = useState('')
     const [redirect, setRedirect] = useState(false)
     const [files, setFiles] = useState('')
-    const {userInfo} = useContext(UserContext)
 
     async function createPost(e) {
         e.preventDefault()
@@ -42,12 +41,11 @@ export default function CreatePostPage() {
         data.set('summary', summary)
         data.set('content', content)
         data.set('file',files[0]) // Grabs only the first file
-        data.set('authorId',userInfo.id)
-        console.log(userInfo.id)
 
         await fetch("http://localhost:3000/posts", {
             method: 'POST',
-            body : data
+            body : data,
+            credentials : 'include',
         }).then(response => {
             if(response.ok) {
                 //alert('Post created successfully')

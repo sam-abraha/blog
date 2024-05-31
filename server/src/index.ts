@@ -7,9 +7,9 @@ import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import multer from 'multer'
 import fs from 'fs'
+import path from 'path'
 
-
-const prisma = new PrismaClient();
+dotenv.config();
 const app = express();
 app.use(cors({
   origin: 'http://localhost:5173', // Allow this origin
@@ -19,8 +19,10 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser())
+// Middleware to serve static files
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
-dotenv.config();
+const prisma = new PrismaClient();
 const PORT = process.env.PORT;
 const SECRET_KEY: string = process.env.SECRET_KEY as string; 
 const SALT = bcrypt.genSaltSync(10)
@@ -126,6 +128,7 @@ app.get('/profile',(req: Request, res: Response) => {
       throw error;
     }
     res.json(info);
+    console.log(path.join(__dirname, 'uploads'));
   });
 
 })
@@ -136,45 +139,87 @@ app.post('/signout', (req: Request, res : Response) => {
 
 })
 
+app.get('/posts',async (req: Request, res : Response) => {
+  // Fetches all posts from Postgres DB
+  //res.json(await prisma.post.findMany())
+  try {
+    const posts = await prisma.post.findMany({
+      include: {
+        author: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 20,
+    });
+
+    res.json(posts);
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    res.status(500).json({ error: 'Error' });
+  }
+})
+
 app.post('/posts', uploadMiddleware.single('file'), async (req: Request, res: Response) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
 
-  const { originalname } = req.file as Express.Multer.File; // Type assertion req.file should be treated as type Express.Multer.File
+  const { originalname, path: tempPath } = req.file as Express.Multer.File;
+
+  //const { originalname } = req.file as Express.Multer.File; // Type assertion req.file should be treated as type Express.Multer.File
   if (!originalname) {
     return res.status(400).json({ error: 'No original file name found' });
   }
 
   // Retrieve extension name of the file
-  const parts = originalname.split('.');
-  const ext = parts[parts.length - 1];
+  //const parts = originalname.split('.');
+  //const ext = parts[parts.length - 1];
 
   if (!req.file.path) {
     return res.status(400).json({ error: 'No file path found' });
   }
 
+  const ext = path.extname(originalname);
+  const newPath = `${tempPath}${ext}`;
+  const finalPath = newPath.replace(/\\/g, '/');
+
+  fs.renameSync(tempPath, newPath);
+
   // Rename file with extension
-  const newPath = `${req.file.path}.${ext}`;
-  fs.renameSync(req.file.path, newPath);
+  //const newPath = `${req.file.path}.${ext}`;
+  //fs.renameSync(req.file.path, newPath);
+  
 
   //res.json({ File : req.file });
 
+
+  const {title, summary, content} = req.body;
+  const {token} = req.cookies;
+
   // Create a post entry inside Postgres DB
-  const {title, summary, content, authorId } = req.body;
 
   try {
-    const postDoc = await prisma.post.create({
-      data : {
-        title,
-        summary,
-        content,
-        cover : newPath,
-        published : true,
-        authorId : parseInt(authorId,10),
-      }
-    })
-    res.status(201).json(postDoc);
+    // Get authorID by verifying the token
+    jwt.verify(token, SECRET_KEY, async (error: any, info: any) => {
+      if (error) throw error;
+      const postDoc = await prisma.post.create({
+        data : {
+          title,
+          summary,
+          content,
+          cover : finalPath,
+          published : true,
+          authorId : info.id
+        }
+      })
+      res.status(201).json(postDoc);
+      console.log(finalPath)
+    });
   }catch(error) {
     res.status(500).json('Error creating post')
   }
