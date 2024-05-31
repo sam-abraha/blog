@@ -16,6 +16,7 @@ const modules = {
         [{ 'direction': 'rtl' }],
         ['bold', 'italic', 'underline', 'strike', 'blockquote'],
         [{ 'color': [] }, { 'background': [] }],
+        ['link', 'image', 'video'],
         ['clean']
     ]
 };
@@ -24,7 +25,8 @@ const formats = [
     'header', 'font', 'size',
     'bold', 'italic', 'underline', 'strike', 'blockquote',
     'list', 'bullet', 'indent',
-    'link', 'image', 'video', 'color', 'background', 'align', 'direction', 'script'
+    'link', 'image', 'video', 'color', 'background', 'align', 'direction', 'script',
+    'Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Georgia', 'Palatino', 'Garamond', 'Bookman', 'Comic Sans MS', 'Trebuchet MS', 'Arial Black', 'Impact'
 ];
 
 export default function CreatePostPage() {

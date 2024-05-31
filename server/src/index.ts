@@ -169,40 +169,29 @@ app.post('/posts', uploadMiddleware.single('file'), async (req: Request, res: Re
     return res.status(400).json({ error: 'No file uploaded' });
   }
 
-  const { originalname, path: tempPath } = req.file as Express.Multer.File;
+  const { originalname, path: tempPath } = req.file as Express.Multer.File; // Type assertion req.file should be treated as type Express.Multer.File
 
-  //const { originalname } = req.file as Express.Multer.File; // Type assertion req.file should be treated as type Express.Multer.File
   if (!originalname) {
     return res.status(400).json({ error: 'No original file name found' });
   }
-
-  // Retrieve extension name of the file
-  //const parts = originalname.split('.');
-  //const ext = parts[parts.length - 1];
 
   if (!req.file.path) {
     return res.status(400).json({ error: 'No file path found' });
   }
 
+  // Add extension to the file name; Replace back slashes with forward slashes in the path
   const ext = path.extname(originalname);
   const newPath = `${tempPath}${ext}`;
   const finalPath = newPath.replace(/\\/g, '/');
 
+  // Rename file
   fs.renameSync(tempPath, newPath);
-
-  // Rename file with extension
-  //const newPath = `${req.file.path}.${ext}`;
-  //fs.renameSync(req.file.path, newPath);
-  
-
-  //res.json({ File : req.file });
 
 
   const {title, summary, content} = req.body;
   const {token} = req.cookies;
 
   // Create a post entry inside Postgres DB
-
   try {
     // Get authorID by verifying the token
     jwt.verify(token, SECRET_KEY, async (error: any, info: any) => {
@@ -224,6 +213,28 @@ app.post('/posts', uploadMiddleware.single('file'), async (req: Request, res: Re
     res.status(500).json('Error creating post')
   }
 
+})
+
+app.get('/posts/:id', async (req : Request , res : Response) => {
+  const {id} = req.params;
+  const numericId = parseInt(id, 10);
+
+  const postDoc = await prisma.post.findUnique({
+    where : {
+      id : numericId
+    },
+    include : {
+      author : {
+        select : {
+          name : true
+        }
+      }
+    }
+  })
+  if (!postDoc) {
+    return res.status(400).json({ error: 'Invalid post ID' });
+  }
+  res.json(postDoc)
 })
 
 // Starts the server

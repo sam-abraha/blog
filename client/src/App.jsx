@@ -7,6 +7,7 @@ import Layout from './components/Layout.jsx'
 import IndexPage from './pages/IndexPage.jsx'
 import { UserContextProvider } from './context/UserContext.jsx'
 import CreatePostPage from './pages/CreatePostPage.jsx'
+import PostPage from './pages/PostPage.jsx'
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
       <Route path="/signin" element={<SigninPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/create-post" element={<CreatePostPage />} />
+      <Route path="/posts/:id" element={<PostPage />} />
     </Route>
     </Routes>
     </UserContextProvider>
