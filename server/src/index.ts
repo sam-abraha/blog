@@ -221,23 +221,36 @@ app.put('/posts/:id', uploadMiddleware.single('file'), async (req, res) => {
   let filePath;
 
   if (req.file) {
-      filePath = req.file.path;
+    const { originalname, path: tempPath } = req.file;
+
+    if (!originalname || !tempPath) {
+      return res.status(400).json({ error: 'No original file name or path found' });
+    }
+
+    // Add extension to the file name; Replace backslashes with forward slashes in the path
+    const ext = path.extname(originalname);
+    const newPath = `${tempPath}${ext}`;
+    const finalPath = newPath.replace(/\\/g, '/');
+
+    // Rename file
+    fs.renameSync(tempPath, newPath);
+    filePath = finalPath;
   }
 
   try {
-      const updatedPost = await prisma.post.update({
-          where: { id: parseInt(id) },
-          data: {
-              title,
-              summary,
-              content,
-              cover: filePath ? filePath : undefined, // Only update cover if a new file is provided
-          },
-      });
-      res.json(updatedPost);
+    const updatedPost = await prisma.post.update({
+      where: { id: parseInt(id) },
+      data: {
+        title,
+        summary,
+        content,
+        cover: filePath ? filePath : undefined, // Only update cover if a new file is provided
+      },
+    });
+    res.json(updatedPost);
   } catch (error) {
-      console.error('Error updating post:', error);
-      res.status(500).json({ error: 'Failed to update post' });
+    console.error('Error updating post:', error);
+    res.status(500).json({ error: 'Failed to update post' });
   }
 });
 
