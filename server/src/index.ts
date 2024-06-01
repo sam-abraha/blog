@@ -295,6 +295,17 @@ app.delete('/posts/:id', async (req: Request, res: Response) => {
         return res.status(403).json({ error: 'Forbidden: You are not the author of this post' });
       }
 
+      if(post.cover) {
+        const filePath = path.join(__dirname,'..', post.cover)
+        fs.unlink(filePath, (error) => {
+          if(error) {
+            console.log('Error deleting file:', error)
+          } else {
+            console.log('File deleted successfully:', filePath)
+          }
+        })
+      }
+
       // Delete post from database
       await prisma.post.delete({
         where: {
