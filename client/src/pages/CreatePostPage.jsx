@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useContext } from 'react';
 import { UserContext } from '../context/UserContext';
 import { Navigate } from 'react-router-dom';
+import TextEditor from '../components/TextEditor';
 
 
 const modules = {
@@ -86,11 +87,7 @@ export default function CreatePostPage() {
                 onChange={e => setFiles(e.target.files)}
                 className="border rounded p-2"
             />
-            <ReactQuill 
-                value={content} 
-                modules={modules} 
-                formats={formats}
-                onChange={value => setContent(value)}/>
+            <TextEditor value={content} onChange={setContent}/>
             <button className="mt-2 border p-2  text-white bg-lime-600 rounded-lg hover:bg-lime-700 w-32">Create</button>
         </form>
     );

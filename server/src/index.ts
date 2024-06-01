@@ -215,6 +215,32 @@ app.post('/posts', uploadMiddleware.single('file'), async (req: Request, res: Re
 
 })
 
+app.put('/posts/:id', uploadMiddleware.single('file'), async (req, res) => {
+  const { id } = req.params;
+  const { title, summary, content } = req.body;
+  let filePath;
+
+  if (req.file) {
+      filePath = req.file.path;
+  }
+
+  try {
+      const updatedPost = await prisma.post.update({
+          where: { id: parseInt(id) },
+          data: {
+              title,
+              summary,
+              content,
+              cover: filePath ? filePath : undefined, // Only update cover if a new file is provided
+          },
+      });
+      res.json(updatedPost);
+  } catch (error) {
+      console.error('Error updating post:', error);
+      res.status(500).json({ error: 'Failed to update post' });
+  }
+});
+
 app.get('/posts/:id', async (req : Request , res : Response) => {
   const {id} = req.params;
   const numericId = parseInt(id, 10);
