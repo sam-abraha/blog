@@ -140,8 +140,8 @@ app.post('/signout', (req: Request, res : Response) => {
 })
 
 app.get('/posts',async (req: Request, res : Response) => {
-  // Fetches all posts from Postgres DB
-  //res.json(await prisma.post.findMany())
+
+  // Fetches all posts from database
   try {
     const posts = await prisma.post.findMany({
       include: {
@@ -191,7 +191,7 @@ app.post('/posts', uploadMiddleware.single('file'), async (req: Request, res: Re
   const {title, summary, content} = req.body;
   const {token} = req.cookies;
 
-  // Create a post entry inside Postgres DB
+  // Create a post entry in database
   try {
     // Get authorID by verifying the token
     jwt.verify(token, SECRET_KEY, async (error: any, info: any) => {
@@ -217,8 +217,9 @@ app.post('/posts', uploadMiddleware.single('file'), async (req: Request, res: Re
 
 app.put('/posts/:id', uploadMiddleware.single('file'), async (req, res) => {
   const { id } = req.params;
-  const { title, summary, content } = req.body;
-  let filePath;
+  const { title, summary, content} = req.body;
+  const { token } = req.cookies;
+  let filePath: string;
 
   if (req.file) {
     const { originalname, path: tempPath } = req.file;
@@ -238,21 +239,43 @@ app.put('/posts/:id', uploadMiddleware.single('file'), async (req, res) => {
   }
 
   try {
-    const updatedPost = await prisma.post.update({
-      where: { id: parseInt(id) },
-      data: {
-        title,
-        summary,
-        content,
-        cover: filePath ? filePath : undefined, // Only update cover if a new file is provided
-      },
+      jwt.verify(token, SECRET_KEY, async (error : any , userInfo : any) => {
+        if (error) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Get post from database
+      const post = await prisma.post.findUnique({
+        where: { id: parseInt(id) },
+      });
+
+      if (!post) {
+        return res.status(404).json({ error: 'Post not found' });
+      }
+
+      // Check if user is author of post
+      if (post.authorId !== userInfo.id) {
+        return res.status(403).json({ error: 'Forbidden: You are not the author of this post' });
+      }
+
+      // Update the post in the database
+      const updatedPostDoc = await prisma.post.update({
+        where: { id: parseInt(id) },
+        data: {
+          title,
+          summary,
+          content,
+          cover: filePath ? filePath : post.cover, // Keep existing cover if no new file
+        },
+      });
+
+      res.json(updatedPostDoc);
     });
-    res.json(updatedPost);
   } catch (error) {
     console.error('Error updating post:', error);
     res.status(500).json({ error: 'Failed to update post' });
   }
-});
+})
 
 app.get('/posts/:id', async (req : Request , res : Response) => {
   const {id} = req.params;
