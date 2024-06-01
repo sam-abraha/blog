@@ -10,6 +10,7 @@
 	<li><strong>Discover:</strong> See others blogs.</li>
 	<li><strong>Upload:</strong> Upload multiple blogs with images.</li>
 	<li><strong>Edit:</strong> Edit your own posts</li>
+	<li><strong>Delete:</strong> Delete your blogs.</li>
   	<li><strong>Authentication:</strong> Token-based Auth with JWT.</li>
 </ul>
 
