@@ -277,6 +277,47 @@ app.put('/posts/:id', uploadMiddleware.single('file'), async (req, res) => {
   }
 })
 
+app.delete('posts/id', async (req : Request, res : Response) => {
+  const { id } = req.params;
+  const { token } = req.body;
+
+  try {
+    jwt.verify(token, SECRET_KEY, async (error : any , info : any ) => {
+      if(error) {
+        return res.status(401).json({error : 'Unauthorized'})
+      }
+
+      // Get post from database
+      const post = await prisma.post.findUnique({
+        where : {
+          id : parseInt(id)
+        }
+      })
+
+      if(!post) {
+        return res.status(400).json({error : "Post not found"})
+      }
+
+      //Check if user is author of post
+      if(post.authorId !== info.id) {
+        return res.status(403).json({error : "Forbidden : Your are not the author of this post"})
+      }
+
+      //Delete post from database
+      await prisma.post.delete({
+        where : {
+          id : parseInt(id)
+        }
+      })
+      
+      res.json({message : "Post deleted sucessfully"})
+    })
+
+  }catch(error) {
+
+  }
+})
+
 app.get('/posts/:id', async (req : Request , res : Response) => {
   const {id} = req.params;
   const numericId = parseInt(id, 10);
