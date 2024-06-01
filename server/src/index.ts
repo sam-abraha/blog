@@ -33,18 +33,6 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Test');
 });
 
-
-async function deleteAllUsers() {
-  try {
-    const result = await prisma.user.deleteMany({});
-    console.log(`Deleted ${result.count} users`);
-  } catch (error) {
-    console.error('Error deleting users:', error);
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
 async function createUser(username: string, password: string) {
   try {
     const hashedPassword = await bcrypt.hash(password, SALT)
@@ -210,7 +198,7 @@ app.post('/posts', uploadMiddleware.single('file'), async (req: Request, res: Re
       console.log(finalPath)
     });
   }catch(error) {
-    res.status(500).json('Error creating post')
+    res.status(500).json({message : ' Error creating post '})
   }
 
 })
@@ -277,46 +265,50 @@ app.put('/posts/:id', uploadMiddleware.single('file'), async (req, res) => {
   }
 })
 
-app.delete('posts/id', async (req : Request, res : Response) => {
+app.delete('/posts/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { token } = req.body;
+  const { token } = req.cookies;
+
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized: No token provided' });
+  }
 
   try {
-    jwt.verify(token, SECRET_KEY, async (error : any , info : any ) => {
-      if(error) {
-        return res.status(401).json({error : 'Unauthorized'})
+    jwt.verify(token, SECRET_KEY, async (error: any, info: any) => {
+      if (error) {
+        return res.status(401).json({ error: 'Unauthorized' });
       }
 
       // Get post from database
       const post = await prisma.post.findUnique({
-        where : {
-          id : parseInt(id)
-        }
-      })
+        where: {
+          id: parseInt(id),
+        },
+      });
 
-      if(!post) {
-        return res.status(400).json({error : "Post not found"})
+      if (!post) {
+        return res.status(400).json({ error: 'Post not found' });
       }
 
-      //Check if user is author of post
-      if(post.authorId !== info.id) {
-        return res.status(403).json({error : "Forbidden : Your are not the author of this post"})
+      // Check if user is author of post
+      if (post.authorId !== info.id) {
+        return res.status(403).json({ error: 'Forbidden: You are not the author of this post' });
       }
 
-      //Delete post from database
+      // Delete post from database
       await prisma.post.delete({
-        where : {
-          id : parseInt(id)
-        }
-      })
-      
-      res.json({message : "Post deleted sucessfully"})
-    })
+        where: {
+          id: parseInt(id),
+        },
+      });
 
-  }catch(error) {
-
+      res.json({ message: 'Post deleted successfully' });
+    });
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    res.status(500).json({ error: 'Failed to delete post' });
   }
-})
+});
 
 app.get('/posts/:id', async (req : Request , res : Response) => {
   const {id} = req.params;
