@@ -116,7 +116,6 @@ app.get('/profile',(req: Request, res: Response) => {
       throw error;
     }
     res.json(info);
-    console.log(path.join(__dirname, 'uploads'));
   });
 
 })
