@@ -1,0 +1,15 @@
+[project]
+name = "my-fullstack-blog"
+
+[plugins]
+  [plugins.client]
+  source = "./client"
+  build = "npm run build"
+  start = "npm run preview"
+  envFile = ".env"
+
+  [plugins.server]
+  source = "./server"
+  build = "npm run build"
+  start = "npm run start"
+  envFile = ".env"
