@@ -1,4 +1,4 @@
-<h1>Blog! Share your news</h1>
+<h1>TechBlog! Share your news</h1>
 
 <p>A blog web application in which you can share news, updates and thoughts with images and texts.</p>
 
@@ -25,7 +25,7 @@
 	<li><strong>Framework:</strong> Express</li>
 	<li><strong>ORM:</strong> Prisma</li>
 	<li><strong>Database:</strong> PostgreSQL</li>
-	<li><strong>Infrastructure:</strong> Railway, Fireabase Cloud Storage</li>
+	<li><strong>Infrastructure:</strong> Railway, Docker and Fireabase Cloud Storage</li>
 </ul>
 
 <h3>Frontend</h3>
