@@ -2,7 +2,7 @@
 
 <p>A blog web application in which you can share news, updates and thoughts with images and texts.</p>
 
-![Showcase Banner] <img width="955" alt="myfullstacktechblog_1" src="https://github.com/sam-abraha/blog/assets/76786028/620266ac-777d-46e4-9cf5-2efb12f080a2">
+<img width="955" alt="myfullstacktechblog_1" src="https://github.com/sam-abraha/blog/assets/76786028/620266ac-777d-46e4-9cf5-2efb12f080a2">
 
 <h2>Features</h2>
 
