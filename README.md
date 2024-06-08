@@ -1,4 +1,4 @@
-<h1>Blog! Share your thoughts</h1>
+<h1>Blog! Share your news</h1>
 
 <p>A blog web application in which you can share news, updates and thoughts with images and texts.</p>
 
@@ -20,9 +20,10 @@
 
 <ul>
 	<li><strong>Language:</strong> TypeScript</li>
-	<li><strong>Framework:</strong> Express.js</li>
+	<li><strong>Framework:</strong> Express</li>
 	<li><strong>ORM:</strong> Prisma</li>
 	<li><strong>Database:</strong> PostgreSQL</li>
+	<li><strong>Infrastructure:</strong>Railway, Fireabase Cloud Storage</li>
 </ul>
 
 <h3>Frontend</h3>
@@ -30,4 +31,5 @@
 <ul>
 	<li><strong>Framework:</strong> React</li>
 	<li><strong>Language:</strong> JavaScript</li>
+	<li><strong>Infrastructure:</strong>Netflify</li>
 </ul>
