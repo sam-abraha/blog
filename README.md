@@ -33,5 +33,5 @@
 <ul>
 	<li><strong>Framework:</strong> React</li>
 	<li><strong>Language:</strong> JavaScript</li>
-	<li><strong>Infrastructure:</strong> Netflify</li>
+	<li><strong>Infrastructure:</strong> Netlify</li>
 </ul>
