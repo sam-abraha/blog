@@ -5,6 +5,15 @@
 <img width="955" alt="myfullstacktechblog_1" src="https://github.com/sam-abraha/blog/assets/76786028/620266ac-777d-46e4-9cf5-2efb12f080a2">
 <img width="955" alt="myfullstacktechblog_2" src="https://github.com/sam-abraha/blog/assets/76786028/861c9b31-463a-4e4e-a3ce-c6ac80da4898">
 
+<h2>Repositories</h2>
+
+<p>Due to the decision of deployment and having a seamless deployment, I laid out the application across seperate repos.<p/>
+
+<ul>
+	<li><strong>Frontend Repo:</strong><a href="https://github.com/sam-abraha/blog-frontend"> Frontend</a></li>
+	<li><strong>Backend Repo:</strong><a href="https://github.com/sam-abraha/blog-backend"> Backend</a></li>
+</ul>
+
 <h2>Features</h2>
 
 
@@ -25,7 +34,7 @@
 	<li><strong>Framework:</strong> Express</li>
 	<li><strong>ORM:</strong> Prisma</li>
 	<li><strong>Database:</strong> PostgreSQL</li>
-	<li><strong>Infrastructure:</strong> Railway, Docker and Fireabase Cloud Storage</li>
+	<li><strong>Infrastructure:</strong> Railway, Firebase Cloud Storage</li>
 </ul>
 
 <h3>Frontend</h3>
@@ -33,5 +42,5 @@
 <ul>
 	<li><strong>Framework:</strong> React</li>
 	<li><strong>Language:</strong> JavaScript</li>
-	<li><strong>Infrastructure:</strong> Netflify</li>
+	<li><strong>Infrastructure:</strong> Netlify</li>
 </ul>
