@@ -7,8 +7,6 @@
 
 <h2>Repositories</h2>
 
-<p>Due to the decision of deployment and having a seamless deployment, I laid out the application across seperate repos.<p/>
-
 <ul>
 	<li><strong>Frontend Repo:</strong><a href="https://github.com/sam-abraha/blog-frontend"> Frontend</a></li>
 	<li><strong>Backend Repo:</strong><a href="https://github.com/sam-abraha/blog-backend"> Backend</a></li>
